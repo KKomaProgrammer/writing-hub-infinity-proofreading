@@ -141,20 +141,21 @@ document.getElementById("langToggle").onclick = () => {
 // ACCEPT
 // --------------------------------
 document.getElementById("btn-accept").onclick = () => {
-  const m = matches[window.currentMatchID];
+  const m = matches[currentMatchID];
 
-  const before = originalText.slice(0, m.offset);
-  const after = originalText.slice(m.offset + m.length);
+  originalText =
+    originalText.slice(0, m.offset) +
+    m.value +
+    originalText.slice(m.offset + m.length);
 
-  const oldLen = m.length;
-  const newLen = m.value.length;
+  m.ignored = true;
 
-  originalText = before + m.value + after;
+  // 다시 정렬해서 안전하게 재배치
+  matches = matches
+    .filter(x => !x.ignored)
+    .concat(matches.filter(x => x.ignored));
 
-  reindexMatches(m.offset, oldLen, newLen);
-
-  matches[window.currentMatchID].ignored = true;
-
+  textInput.value = originalText;
   closePopup();
   render();
 };
@@ -172,23 +173,42 @@ document.getElementById("btn-ignore").onclick = () => {
 // APPLY ALL
 // --------------------------------
 document.getElementById("applyAllBtn").onclick = () => {
-  matches.forEach(m => {
-    if (m.ignored) return;
+  // 뒤에서부터 정렬
+  const sorted = matches
+    .filter(m => !m.ignored)
+    .sort((a, b) => b.offset - a.offset);
 
-    const before = originalText.slice(0, m.offset);
-    const after = originalText.slice(m.offset + m.length);
-    originalText = before + m.value + after;
-
-    const oldLen = m.length;
-    const newLen = m.value.length;
-    reindexMatches(m.offset, oldLen, newLen);
+  sorted.forEach(m => {
+    originalText =
+      originalText.slice(0, m.offset) +
+      m.value +
+      originalText.slice(m.offset + m.length);
 
     m.ignored = true;
   });
 
-  closePopup();
+  textInput.value = originalText;
   render();
+  closePopup();
 };
+// document.getElementById("applyAllBtn").onclick = () => {
+//   matches.forEach(m => {
+//     if (m.ignored) return;
+
+//     const before = originalText.slice(0, m.offset);
+//     const after = originalText.slice(m.offset + m.length);
+//     originalText = before + m.value + after;
+
+//     const oldLen = m.length;
+//     const newLen = m.value.length;
+//     reindexMatches(m.offset, oldLen, newLen);
+
+//     m.ignored = true;
+//   });
+
+//   closePopup();
+//   render();
+// };
 
 // --------------------------------
 // IGNORE ALL
