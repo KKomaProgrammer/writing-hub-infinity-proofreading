@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Proofreading</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+<div class="toolbar">
+  <button onclick="applyAll()">모두 적용</button>
+  <button onclick="ignoreAll()">모두 거부</button>
+</div>
+<div id="viewer" class="viewer"></div>
+
+<div id="popup" class="popup hidden">
+  <div class="popup-header">
+    <span id="popup-original"></span>
+    <span class="arrow">></span>
+    <span id="popup-suggest"></span>
+    <button id="langToggle">EN/KO</button>
+  </div>
+  <div id="popup-body"></div>
+  <div class="popup-footer">
+    <button id="btn-accept" class="accept">Accept</button>
+    <button id="btn-ignore" class="ignore">Ignore</button>
+  </div>
+</div>
+
+</body>
+</html>

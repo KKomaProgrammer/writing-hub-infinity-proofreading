@@ -1,0 +1,9 @@
+.viewer { white-space: pre-wrap; line-height:1.8; font-size:18px;}
+.wrong{color:#e04f5f;text-decoration:line-through;background:rgba(224,79,95,.1);padding:2px 3px;border-radius:4px;cursor:pointer;}
+.correct{color:#2db783;font-weight:600;background:rgba(45,183,131,.08);padding:2px 3px;border-radius:4px;cursor:pointer;margin-left:4px;}
+.popup{position:absolute;width:340px;padding:18px;background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.18);z-index:100;}
+.hidden{display:none;}
+.popup-header{display:flex;gap:8px;font-size:18px;font-weight:600;}
+.popup-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+.accept{background:#6a4cff;color:#fff;padding:8px 18px;border-radius:8px;border:none;}
+.ignore{background:#eee;color:#555;padding:8px 18px;border-radius:8px;border:none;}
