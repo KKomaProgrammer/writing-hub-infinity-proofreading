@@ -2,37 +2,60 @@ let originalText = "";
 let matches = [];
 let lang = "en";
 
+const textInput = document.getElementById("textInput");
+const viewer = document.getElementById("viewer");
+
+// --------------------------------
+// ACTUAL PROOFREAD BUTTON
+// --------------------------------
 document.getElementById("runBtn").onclick = async () => {
-  const text = document.getElementById("textInput").value.trim();
-  if (!text) return alert("본문을 입력하세요.");
+  const userText = textInput.value.trim();
+  if (!userText) return alert("본문을 입력해주세요!");
 
   const res = await fetch("/api/proofreading", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
+    body: JSON.stringify({ text: userText })
   });
 
   const data = await res.json();
-  const rtn = data.payload.rtn;
-
-  originalText = rtn.text;
-  matches = rtn.matches.map((m, i) => ({ ...m, id: i, ignored: false }));
+  originalText = data.payload.rtn.text;
+  matches = data.payload.rtn.matches.map((m, i) => ({
+    ...m,
+    id: i,
+    ignored: false
+  }));
 
   document.getElementById("toolbar").classList.remove("hidden");
   render();
 };
 
-// -------------------------
+// --------------------------------
+// OFFSET REINDEXING AFTER APPLY
+// --------------------------------
+function reindexMatches(oldOffset, oldLength, newLength) {
+  const diff = newLength - oldLength;
 
+  matches = matches.map(m => {
+    if (m.offset > oldOffset) {
+      return { ...m, offset: m.offset + diff };
+    }
+    return m;
+  });
+}
+
+// --------------------------------
+// MAIN TOKENIZER
+// --------------------------------
 function buildTokens(text, matches) {
-  const result = [];
+  let result = [];
   let cursor = 0;
 
   matches.forEach(m => {
     if (m.ignored) return;
 
     const before = text.slice(cursor, m.offset);
-    if (before.length) result.push({ type: "text", text: before });
+    if (before) result.push({ type: "text", text: before });
 
     const wrong = text.slice(m.offset, m.offset + m.length);
 
@@ -53,11 +76,13 @@ function buildTokens(text, matches) {
   return result;
 }
 
+// --------------------------------
+// RENDER
+// --------------------------------
 function render() {
-  const tokens = buildTokens(originalText, matches);
-  const viewer = document.getElementById("viewer");
-
   viewer.innerHTML = "";
+
+  const tokens = buildTokens(originalText, matches);
 
   tokens.forEach(t => {
     if (t.type === "text") {
@@ -78,18 +103,22 @@ function render() {
       }
     }
   });
+
+  // textarea에도 반영
+  textInput.value = originalText;
 }
 
-// ----------------------------------
+// --------------------------------
+// POPUP
+// --------------------------------
+function openPopup(match, x, y) {
+  window.currentMatchID = match.id;
 
-function openPopup(m, x, y) {
-  window.currentID = m.id;
-
-  document.getElementById("popup-original").textContent = m.wrong;
-  document.getElementById("popup-suggest").textContent = m.correct;
+  document.getElementById("popup-original").textContent = match.wrong;
+  document.getElementById("popup-suggest").textContent = match.correct;
 
   document.getElementById("popup-body").textContent =
-    lang === "en" ? m.data.feedback : m.data.feedback_ko;
+    lang === "en" ? match.data.feedback : match.data.feedback_ko;
 
   const p = document.getElementById("popup");
   p.style.left = x + "px";
@@ -97,46 +126,80 @@ function openPopup(m, x, y) {
   p.classList.remove("hidden");
 }
 
+// EN/KO 즉시 반영
 document.getElementById("langToggle").onclick = () => {
   lang = lang === "en" ? "ko" : "en";
-  const m = matches[window.currentID];
+  const m = matches[window.currentMatchID];
+
   document.getElementById("popup-body").textContent =
     lang === "en" ? m.data.feedback : m.data.feedback_ko;
+
+  document.getElementById("langToggle").textContent = lang.toUpperCase();
 };
 
+// --------------------------------
+// ACCEPT
+// --------------------------------
 document.getElementById("btn-accept").onclick = () => {
-  const m = matches[window.currentID];
-  originalText =
-    originalText.slice(0, m.offset) +
-    m.value +
-    originalText.slice(m.offset + m.length);
+  const m = matches[window.currentMatchID];
+
+  const before = originalText.slice(0, m.offset);
+  const after = originalText.slice(m.offset + m.length);
+
+  const oldLen = m.length;
+  const newLen = m.value.length;
+
+  originalText = before + m.value + after;
+
+  reindexMatches(m.offset, oldLen, newLen);
+
+  matches[window.currentMatchID].ignored = true;
+
   closePopup();
   render();
 };
 
+// --------------------------------
+// IGNORE
+// --------------------------------
 document.getElementById("btn-ignore").onclick = () => {
-  matches[window.currentID].ignored = true;
+  matches[window.currentMatchID].ignored = true;
   closePopup();
   render();
 };
 
-function applyAll() {
+// --------------------------------
+// APPLY ALL
+// --------------------------------
+document.getElementById("applyAllBtn").onclick = () => {
   matches.forEach(m => {
-    originalText =
-      originalText.slice(0, m.offset) +
-      m.value +
-      originalText.slice(m.offset + m.length);
+    if (m.ignored) return;
+
+    const before = originalText.slice(0, m.offset);
+    const after = originalText.slice(m.offset + m.length);
+    originalText = before + m.value + after;
+
+    const oldLen = m.length;
+    const newLen = m.value.length;
+    reindexMatches(m.offset, oldLen, newLen);
+
+    m.ignored = true;
   });
+
   closePopup();
   render();
-}
+};
 
-function ignoreAll() {
+// --------------------------------
+// IGNORE ALL
+// --------------------------------
+document.getElementById("ignoreAllBtn").onclick = () => {
   matches.forEach(m => (m.ignored = true));
   closePopup();
   render();
-}
+};
 
+// Close popup
 function closePopup() {
   document.getElementById("popup").classList.add("hidden");
 }
