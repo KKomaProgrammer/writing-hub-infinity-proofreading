@@ -16,11 +16,11 @@ function smartReplace(text, offset, length, replacement) {
 
   let final = replacement;
 
-  // 필요 시 앞 공백 자동 추가
+  // 앞 공백 자동 보정
   if (beforeChar && beforeChar !== " " && /^[a-zA-Z가-힣0-9]/.test(replacement[0])) {
     final = " " + final;
   }
-  // 필요 시 뒤 공백 자동 추가
+  // 뒤 공백 자동 보정
   if (afterChar && afterChar !== " " && /^[a-zA-Z가-힣0-9]$/.test(replacement[replacement.length - 1])) {
     final = final + " ";
   }
@@ -53,10 +53,11 @@ function render() {
   let html = "";
   let lastIndex = 0;
 
-  const active = matches.filter(m => !m.ignored)
-                        .sort((a, b) => a.offset - b.offset);
+  const active = matches
+    .filter(m => !m.ignored)
+    .sort((a, b) => a.offset - b.offset);
 
-  active.forEach((m, idx) => {
+  active.forEach(m => {
     html += escapeHTML(originalText.slice(lastIndex, m.offset));
 
     html += `
@@ -134,7 +135,7 @@ document.getElementById("lang-switch").onclick = () => {
 };
 
 /* =============================
-      개별 적용 버튼
+      개별 적용
 ============================= */
 document.getElementById("btn-accept").onclick = () => {
   const m = currentPopupMatch;
@@ -152,7 +153,7 @@ document.getElementById("btn-accept").onclick = () => {
 };
 
 /* =============================
-      개별 거부 버튼
+      개별 거부
 ============================= */
 document.getElementById("btn-ignore").onclick = () => {
   currentPopupMatch.ignored = true;
@@ -164,14 +165,15 @@ document.getElementById("btn-ignore").onclick = () => {
         전체 적용
 ============================= */
 document.getElementById("apply-all").onclick = () => {
-  const active = matches.filter(m => !m.ignored)
-                       .sort((a, b) => b.offset - a.offset);
+  const active = matches
+    .filter(m => !m.ignored)
+    .sort((a, b) => b.offset - a.offset);
 
   active.forEach(m => {
     originalText = smartReplace(originalText, m.offset, m.length, m.value);
   });
 
-  matches.forEach(m => m.ignored = true);
+  matches.forEach(m => (m.ignored = true));
 
   render();
 };
@@ -180,7 +182,7 @@ document.getElementById("apply-all").onclick = () => {
         전체 거부
 ============================= */
 document.getElementById("ignore-all").onclick = () => {
-  matches.forEach(m => m.ignored = true);
+  matches.forEach(m => (m.ignored = true));
   render();
 };
 
@@ -188,26 +190,28 @@ document.getElementById("ignore-all").onclick = () => {
       Proofreading 요청
 ============================= */
 async function doProofread() {
-  const text = document.getElementById("textarea").value;
-  originalText = text;
+  const inputText = document.getElementById("textarea").value;
+  originalText = inputText;
 
-  showLoadingBar(); // 로딩 시작
+  showLoadingBar();
 
   const res = await fetch("/api/proofreading", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
+    body: JSON.stringify({ text: inputText })
   });
 
   const data = await res.json();
 
-  matches = data.matches.map(m => ({
+  // Writing Hub API 구조 그대로 반영
+  originalText = data.payload.rtn.text;
+
+  matches = data.payload.rtn.matches.map(m => ({
     ...m,
     ignored: false
   }));
 
-  hideLoadingBar(); // 로딩 종료
-
+  hideLoadingBar();
   render();
 }
 
@@ -223,13 +227,13 @@ function showLoadingBar() {
   bar.style.width = "0%";
   bar.style.opacity = 1;
 
-  const predicted = getRandomInt(55, 80) * 1000; // 55~80초 무작위
+  const predicted = getRandomInt(55, 80) * 1000; // 55~80초 예측
 
   const start = Date.now();
 
   loadingInterval = setInterval(() => {
     const now = Date.now();
-    const ratio = Math.min((now - start) / predicted, 0.98); // 98%까지만
+    const ratio = Math.min((now - start) / predicted, 0.98);
 
     bar.style.width = (ratio * 100) + "%";
   }, 100);
@@ -239,7 +243,7 @@ function hideLoadingBar() {
   clearInterval(loadingInterval);
   const bar = document.getElementById("loading-bar");
   bar.style.width = "100%";
-  setTimeout(() => bar.style.opacity = 0, 500);
+  setTimeout(() => (bar.style.opacity = 0), 500);
 }
 
 function getRandomInt(min, max) {
