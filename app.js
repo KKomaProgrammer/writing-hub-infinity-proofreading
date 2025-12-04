@@ -8,13 +8,13 @@ const viewer = document.getElementById("viewer");
 
 
 // --------------------------------------------------
-// GLOBAL LANGUAGE TOGGLE
+// 글로벌 언어 전환
 // --------------------------------------------------
 document.getElementById("globalLang").onclick = () => {
   lang = lang === "en" ? "ko" : "en";
   document.getElementById("globalLang").textContent = lang.toUpperCase();
 
-  // 팝업 열려있을 경우 즉시 반영
+  // 팝업이 열려 있으면 즉시 업데이트
   const popup = document.getElementById("popup");
   if (!popup.classList.contains("hidden") && currentMatchID !== null) {
     const m = matches[currentMatchID];
@@ -25,7 +25,33 @@ document.getElementById("globalLang").onclick = () => {
 
 
 // --------------------------------------------------
-// PROOFREAD BUTTON
+// Smart Replace (단어 붙음 방지 / 자연스러운 교정)
+// --------------------------------------------------
+function smartReplace(text, offset, length, replacement) {
+  const beforeChar = text[offset - 1] || "";
+  const afterChar = text[offset + length] || "";
+
+  let final = replacement;
+
+  // 앞뒤 공백 자동 보정
+  if (beforeChar && beforeChar !== " " && /^[A-Za-z가-힣]/.test(replacement[0])) {
+    final = " " + final;
+  }
+  if (afterChar && afterChar !== " " && /[A-Za-z가-힣]$/.test(replacement[replacement.length - 1])) {
+    final = final + " ";
+  }
+
+  return (
+    text.slice(0, offset) +
+    final +
+    text.slice(offset + length)
+  );
+}
+
+
+
+// --------------------------------------------------
+// Proofreading 요청
 // --------------------------------------------------
 document.getElementById("runBtn").onclick = async () => {
   const userText = textInput.value.trim();
@@ -56,7 +82,7 @@ document.getElementById("runBtn").onclick = async () => {
 
 
 // --------------------------------------------------
-// RENDER FUNCTION
+// 화면 렌더링
 // --------------------------------------------------
 function render() {
   viewer.innerHTML = "";
@@ -83,9 +109,8 @@ function render() {
     cursor = m.offset + m.length;
   });
 
-  if (cursor < originalText.length) {
+  if (cursor < originalText.length)
     tokens.push({ type: "text", text: originalText.slice(cursor) });
-  }
 
   tokens.forEach(t => {
     if (t.type === "text") {
@@ -105,12 +130,14 @@ function render() {
     }
   });
 
+  // textarea와 동기화
   textInput.value = originalText;
 }
 
 
+
 // --------------------------------------------------
-// POPUP OPEN
+// 팝업 열기
 // --------------------------------------------------
 function openPopup(match, x, y) {
   currentMatchID = match.id;
@@ -127,8 +154,9 @@ function openPopup(match, x, y) {
 }
 
 
+
 // --------------------------------------------------
-// POPUP LANGUAGE TOGGLE
+// 팝업 EN/KO 전환
 // --------------------------------------------------
 document.getElementById("langToggle").onclick = () => {
   lang = lang === "en" ? "ko" : "en";
@@ -140,16 +168,14 @@ document.getElementById("langToggle").onclick = () => {
 };
 
 
+
 // --------------------------------------------------
-// ACCEPT (개별 적용)
+// 개별 적용 (Apply)
 // --------------------------------------------------
 document.getElementById("btn-accept").onclick = () => {
   const m = matches[currentMatchID];
 
-  originalText =
-    originalText.slice(0, m.offset) +
-    m.value +
-    originalText.slice(m.offset + m.length);
+  originalText = smartReplace(originalText, m.offset, m.length, m.value);
 
   m.ignored = true;
 
@@ -158,8 +184,9 @@ document.getElementById("btn-accept").onclick = () => {
 };
 
 
+
 // --------------------------------------------------
-// IGNORE (개별 거부)
+// 개별 무시 (Ignore)
 // --------------------------------------------------
 document.getElementById("btn-ignore").onclick = () => {
   matches[currentMatchID].ignored = true;
@@ -168,23 +195,24 @@ document.getElementById("btn-ignore").onclick = () => {
 };
 
 
+
 // --------------------------------------------------
-// APPLY ALL (전체 적용)
+// 전체 적용
 // --------------------------------------------------
 document.getElementById("applyAllBtn").onclick = () => {
   const active = matches.filter(m => !m.ignored);
   active.sort((a, b) => b.offset - a.offset);
 
   active.forEach(m => {
-    originalText =
-      originalText.slice(0, m.offset) +
-      m.value +
-      originalText.slice(m.offset + m.length);
-
+    originalText = smartReplace(
+      originalText,
+      m.offset,
+      m.length,
+      m.value
+    );
     m.ignored = true;
   });
 
-  // 전체 matches 클린업
   matches = matches.map(m => ({ ...m, ignored: true }));
 
   closePopup();
@@ -192,8 +220,9 @@ document.getElementById("applyAllBtn").onclick = () => {
 };
 
 
+
 // --------------------------------------------------
-// IGNORE ALL (전체 거부)
+// 전체 무시
 // --------------------------------------------------
 document.getElementById("ignoreAllBtn").onclick = () => {
   matches.forEach(m => (m.ignored = true));
@@ -202,17 +231,18 @@ document.getElementById("ignoreAllBtn").onclick = () => {
 };
 
 
+
 // --------------------------------------------------
-// CLOSE POPUP
+// 팝업 닫기
 // --------------------------------------------------
 function closePopup() {
   document.getElementById("popup").classList.add("hidden");
 }
 
 
+
 // --------------------------------------------------
-// ADVANCED LOADING BAR
-// 걸린 시간 / (55~80 무작위) 기반 예측형 로딩바
+// 로딩바 개선(요청 즉시 0→70, 응답 시 빠르게 70→100)
 // --------------------------------------------------
 let loadingInterval = null;
 let loadingProgress = 0;
@@ -229,9 +259,8 @@ function startLoadingBar() {
   fill.style.width = "0%";
   fill.style.transition = "none";
 
-  // 0% → 70%까지 자연 증가 (1.1초)
   const target = 70;
-  const duration = 1100; // 1.1초 (이전보다 살짝 감소한 값)
+  const duration = 1100; // 1.1초
 
   const start = Date.now();
   loadingInterval = setInterval(() => {
@@ -252,15 +281,12 @@ function finishLoadingBar() {
   const bar = document.getElementById("loadingBar");
   const fill = document.getElementById("loadingFill");
 
-  // 응답이 왔으면 70% → 100% 빠르게 채움
   clearInterval(loadingInterval);
 
-  // 예측시간 살짝 감소:
-  // 실제걸린시간 / (65~75) → 이전보다 확실히 짧아짐
+  const actual = Date.now() - startTime;
   const divisor = Math.floor(Math.random() * (75 - 65 + 1)) + 65;
 
-  const actual = Date.now() - startTime;
-  const predicted = actual / divisor; // 더 짧게!
+  const predicted = actual / divisor;
   const duration = Math.max(predicted, 0.12); // 최소 0.12초
 
   fill.style.transition = `width ${duration}s linear`;
