@@ -53,30 +53,23 @@ button:hover {
 
 /* -------------- 핵심: 줄바꿈 방지 -------------- */
 .error-part {
-  display: inline-flex;     /* 한 덩어리로 묶기 */
+  display: inline-flex;
+  white-space: nowrap;
   align-items: center;
-  white-space: nowrap;      /* 강제 줄바꿈 차단 */
   background: #ffecec;
   border-bottom: 2px solid #ff7979;
   cursor: pointer;
-  padding: 1px 3px;
+  padding: 1px 4px;
   border-radius: 3px;
+  max-width: fit-content;
 }
 
-.error-part .wrong {
-  color: #d90000;
-  text-decoration: line-through;
-  margin-right: 4px;
-  display: inline-block;
-  white-space: nowrap;
-}
-
+.error-part .wrong,
 .error-part .suggest {
-  color: #009e14;
-  font-weight: bold;
-  display: inline-block;
   white-space: nowrap;
+  display: inline-block;
 }
+
 
 /* -------------- Popup -------------- */
 #popup {
