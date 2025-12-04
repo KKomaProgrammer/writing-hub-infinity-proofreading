@@ -145,3 +145,18 @@ input, textarea {
   border-radius: 10px;
   border: none;
 }
+.loading {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+#loadingFill {
+  width: 0%;
+  height: 100%;
+  background: #6a4cff;
+  transition: width 0.2s linear;
+}
+.hidden { display: none; }
