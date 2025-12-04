@@ -6,6 +6,7 @@ let currentMatchID = null;
 const textInput = document.getElementById("textInput");
 const viewer = document.getElementById("viewer");
 
+
 // --------------------------------------------------
 // GLOBAL LANGUAGE TOGGLE
 // --------------------------------------------------
@@ -13,7 +14,7 @@ document.getElementById("globalLang").onclick = () => {
   lang = lang === "en" ? "ko" : "en";
   document.getElementById("globalLang").textContent = lang.toUpperCase();
 
-  // 팝업이 열려 있으면 즉시 업데이트
+  // 팝업 열려있을 경우 즉시 반영
   const popup = document.getElementById("popup");
   if (!popup.classList.contains("hidden") && currentMatchID !== null) {
     const m = matches[currentMatchID];
@@ -21,6 +22,7 @@ document.getElementById("globalLang").onclick = () => {
       lang === "en" ? m.data.feedback : m.data.feedback_ko;
   }
 };
+
 
 // --------------------------------------------------
 // PROOFREAD BUTTON
@@ -37,7 +39,7 @@ document.getElementById("runBtn").onclick = async () => {
     body: JSON.stringify({ text: userText })
   });
 
-  endLoadingBar();
+  finishLoadingBar();
 
   const data = await res.json();
 
@@ -51,6 +53,7 @@ document.getElementById("runBtn").onclick = async () => {
   document.getElementById("toolbar").classList.remove("hidden");
   render();
 };
+
 
 // --------------------------------------------------
 // RENDER FUNCTION
@@ -105,6 +108,7 @@ function render() {
   textInput.value = originalText;
 }
 
+
 // --------------------------------------------------
 // POPUP OPEN
 // --------------------------------------------------
@@ -122,6 +126,7 @@ function openPopup(match, x, y) {
   popup.classList.remove("hidden");
 }
 
+
 // --------------------------------------------------
 // POPUP LANGUAGE TOGGLE
 // --------------------------------------------------
@@ -134,13 +139,13 @@ document.getElementById("langToggle").onclick = () => {
     lang === "en" ? m.data.feedback : m.data.feedback_ko;
 };
 
+
 // --------------------------------------------------
 // ACCEPT (개별 적용)
 // --------------------------------------------------
 document.getElementById("btn-accept").onclick = () => {
   const m = matches[currentMatchID];
 
-  // Apply
   originalText =
     originalText.slice(0, m.offset) +
     m.value +
@@ -152,6 +157,7 @@ document.getElementById("btn-accept").onclick = () => {
   render();
 };
 
+
 // --------------------------------------------------
 // IGNORE (개별 거부)
 // --------------------------------------------------
@@ -160,6 +166,7 @@ document.getElementById("btn-ignore").onclick = () => {
   closePopup();
   render();
 };
+
 
 // --------------------------------------------------
 // APPLY ALL (전체 적용)
@@ -177,11 +184,13 @@ document.getElementById("applyAllBtn").onclick = () => {
     m.ignored = true;
   });
 
+  // 전체 matches 클린업
   matches = matches.map(m => ({ ...m, ignored: true }));
 
   closePopup();
   render();
 };
+
 
 // --------------------------------------------------
 // IGNORE ALL (전체 거부)
@@ -192,6 +201,7 @@ document.getElementById("ignoreAllBtn").onclick = () => {
   render();
 };
 
+
 // --------------------------------------------------
 // CLOSE POPUP
 // --------------------------------------------------
@@ -199,27 +209,42 @@ function closePopup() {
   document.getElementById("popup").classList.add("hidden");
 }
 
+
 // --------------------------------------------------
-// LOADING BAR
+// ADVANCED LOADING BAR
+// 걸린 시간 / (55~80 무작위) 기반 예측형 로딩바
 // --------------------------------------------------
+let startTime = 0;
+
 function startLoadingBar() {
+  startTime = Date.now();
+
   const bar = document.getElementById("loadingBar");
   const fill = document.getElementById("loadingFill");
 
   bar.classList.remove("hidden");
   fill.style.width = "0%";
-
-  setTimeout(() => (fill.style.width = "40%"), 100);
-  setTimeout(() => (fill.style.width = "70%"), 400);
-  setTimeout(() => (fill.style.width = "100%"), 1000);
+  fill.style.transition = "none";
 }
 
-function endLoadingBar() {
+function finishLoadingBar() {
   const bar = document.getElementById("loadingBar");
   const fill = document.getElementById("loadingFill");
 
+  const endTime = Date.now();
+  const actual = endTime - startTime;  // 실제 걸린 시간(ms)
+
+  const divisor = Math.floor(Math.random() * (80 - 55 + 1)) + 55;
+  const predicted = actual / divisor;
+
+  const duration = Math.max(predicted, 0.3); // 최소 0.3초
+
+  fill.style.transition = `width ${duration}s linear`;
+  fill.style.width = "100%";
+
   setTimeout(() => {
     bar.classList.add("hidden");
+    fill.style.transition = "none";
     fill.style.width = "0%";
-  }, 300);
+  }, duration * 1000 + 150);
 }
