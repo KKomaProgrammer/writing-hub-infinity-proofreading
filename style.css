@@ -1,162 +1,136 @@
 body {
+  font-family: "Segoe UI", sans-serif;
   margin: 0;
-  background: #f5f6fb;
-  font-family: Pretendard, sans-serif;
-}
-
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 40px;
-  background: #ffffff;
-  border-radius: 22px;
-  box-shadow: 0 8px 28px rgba(0,0,0,.08);
+  padding: 20px;
+  background: #f7f7f7;
 }
 
 h1 {
   margin-top: 0;
-  margin-bottom: 30px;
-  font-size: 28px;
+  font-size: 24px;
 }
 
-.input-area {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
-}
-
-input, textarea {
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid #dcdcdc;
-  font-size: 16px;
-}
-
-#runBtn {
-  padding: 14px;
-  border: none;
-  background: #6850ff;
-  color: white;
-  border-radius: 12px;
-  font-size: 17px;
-  cursor: pointer;
-}
-#runBtn:hover { background: #5841e7; }
-
-.toolbar {
-  display: flex;
-  gap: 12px;
-  margin: 25px 0 20px;
-}
-
-.toolbar-btn {
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
+textarea {
+  width: 100%;
+  height: 180px;
+  padding: 12px;
   font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 15px;
 }
 
-.toolbar-btn.apply {
-  background: #3cc176;
-  color: #fff;
-  font-weight: 600;
+.btn-row {
+  margin-bottom: 15px;
 }
-.toolbar-btn.apply:hover { background: #2da966; }
 
-.toolbar-btn.ignore {
-  background: #ff6b6b;
-  color: #fff;
-  font-weight: 600;
+button {
+  padding: 9px 15px;
+  margin-right: 7px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #0078ff;
+  color: white;
+  font-size: 14px;
 }
-.toolbar-btn.ignore:hover { background: #e85c5c; }
 
-.viewer {
+button:hover {
+  opacity: 0.9;
+}
+
+#text-preview {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  min-height: 200px;
   white-space: pre-wrap;
-  line-height: 1.8;
-  font-size: 19px;
+  line-height: 1.55;
 }
 
-.wrong {
-  color: #e04f5f;
+/* -------------- 핵심: 줄바꿈 방지 -------------- */
+.error-part {
+  display: inline-flex;     /* 한 덩어리로 묶기 */
+  align-items: center;
+  white-space: nowrap;      /* 강제 줄바꿈 차단 */
+  background: #ffecec;
+  border-bottom: 2px solid #ff7979;
+  cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+
+.error-part .wrong {
+  color: #d90000;
   text-decoration: line-through;
-  background: rgba(224,79,95,.12);
-  padding: 2px 4px;
-  border-radius: 4px;
-  cursor: pointer;
+  margin-right: 4px;
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.correct {
-  color: #2db783;
-  font-weight: 600;
-  background: rgba(45,183,131,.08);
-  padding: 2px 4px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 3px;
+.error-part .suggest {
+  color: #009e14;
+  font-weight: bold;
+  display: inline-block;
+  white-space: nowrap;
 }
 
-/* POPUP */
-.popup {
-  position: absolute;
-  width: 360px;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+/* -------------- Popup -------------- */
+#popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
-.popup.hidden { display: none; }
-
-.popup-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.lang-btn {
-  margin-left: auto;
-  border: none;
-  background: #eaeaea;
-  padding: 5px 13px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.popup-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.accept {
-  background: #6a4cff;
-  color: #fff;
-  padding: 10px 18px;
+#popup-content {
+  background: white;
+  width: 380px;
+  padding: 20px;
   border-radius: 10px;
-  border: none;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.2);
 }
-.ignore {
-  background: #dcdcdc;
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
+
+#popup-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
 }
-.loading {
+
+#popup-feedback {
+  background: #f6f6f6;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  height: 90px;
+  overflow-y: auto;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* -------------- 로딩바 -------------- */
+#loading-container {
   width: 100%;
   height: 6px;
   background: #ddd;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 15px;
+  margin: 10px 0 20px 0;
+  opacity: 1;
+  transition: opacity 0.4s;
 }
-#loadingFill {
-  width: 0%;
+
+#loading-bar {
   height: 100%;
-  background: #6a4cff;
+  width: 0%;
+  background: #32a4ff;
   transition: width 0.2s linear;
 }
-.hidden { display: none; }
