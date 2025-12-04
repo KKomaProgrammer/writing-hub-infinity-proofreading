@@ -2,14 +2,24 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Proofreading</title>
+  <title>Wrting Hub Proofreading</title>
   <link rel="stylesheet" href="/style.css" />
   <script defer src="/app.js"></script>
 </head>
+
 <body>
+<div class="lang-global">
+  <button id="globalLang">EN</button>
+</div>
+
 <div class="container">
 
-  <h1>AI Proofreading</h1>
+  <h1>Wrting Hub Proofreading</h1>
+
+  <!-- 로딩바 -->
+  <div id="loadingBar" class="loading hidden">
+    <div id="loadingFill"></div>
+  </div>
 
   <div class="input-area">
     <input id="titleInput" placeholder="제목을 입력하세요 (선택)">
@@ -17,15 +27,15 @@
     <button id="runBtn">Proofread</button>
   </div>
 
-  <!-- 아름다운 개선된 Toolbar -->
+  <!-- Toolbar -->
   <div id="toolbar" class="toolbar hidden">
     <button id="applyAllBtn" class="toolbar-btn apply">✔ 모두 적용</button>
     <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ 모두 거부</button>
   </div>
 
   <div id="viewer" class="viewer"></div>
-
 </div>
+
 
 <!-- Popup -->
 <div id="popup" class="popup hidden">
@@ -33,8 +43,6 @@
     <span id="popup-original" class="popup-original"></span>
     <span class="arrow">></span>
     <span id="popup-suggest" class="popup-suggest"></span>
-
-    <!-- 즉시 전환되는 EN/KO -->
     <button id="langToggle" class="lang-btn">EN</button>
   </div>
 
