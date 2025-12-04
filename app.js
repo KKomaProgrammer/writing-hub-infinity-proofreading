@@ -214,10 +214,13 @@ function closePopup() {
 // ADVANCED LOADING BAR
 // 걸린 시간 / (55~80 무작위) 기반 예측형 로딩바
 // --------------------------------------------------
+let loadingInterval = null;
+let loadingProgress = 0;
 let startTime = 0;
 
 function startLoadingBar() {
   startTime = Date.now();
+  loadingProgress = 0;
 
   const bar = document.getElementById("loadingBar");
   const fill = document.getElementById("loadingFill");
@@ -225,19 +228,40 @@ function startLoadingBar() {
   bar.classList.remove("hidden");
   fill.style.width = "0%";
   fill.style.transition = "none";
+
+  // 0% → 70%까지 자연 증가 (1.1초)
+  const target = 70;
+  const duration = 1100; // 1.1초 (이전보다 살짝 감소한 값)
+
+  const start = Date.now();
+  loadingInterval = setInterval(() => {
+    const elapsed = Date.now() - start;
+    const ratio = Math.min(elapsed / duration, 1);
+
+    loadingProgress = target * ratio;
+    fill.style.width = loadingProgress + "%";
+
+    if (ratio >= 1) {
+      clearInterval(loadingInterval);
+      loadingInterval = null;
+    }
+  }, 16);
 }
 
 function finishLoadingBar() {
   const bar = document.getElementById("loadingBar");
   const fill = document.getElementById("loadingFill");
 
-  const endTime = Date.now();
-  const actual = endTime - startTime;  // 실제 걸린 시간(ms)
+  // 응답이 왔으면 70% → 100% 빠르게 채움
+  clearInterval(loadingInterval);
 
-  const divisor = Math.floor(Math.random() * (80 - 55 + 1)) + 55;
-  const predicted = actual / divisor;
+  // 예측시간 살짝 감소:
+  // 실제걸린시간 / (65~75) → 이전보다 확실히 짧아짐
+  const divisor = Math.floor(Math.random() * (75 - 65 + 1)) + 65;
 
-  const duration = Math.max(predicted, 0.3); // 최소 0.3초
+  const actual = Date.now() - startTime;
+  const predicted = actual / divisor; // 더 짧게!
+  const duration = Math.max(predicted, 0.12); // 최소 0.12초
 
   fill.style.transition = `width ${duration}s linear`;
   fill.style.width = "100%";
@@ -246,5 +270,5 @@ function finishLoadingBar() {
     bar.classList.add("hidden");
     fill.style.transition = "none";
     fill.style.width = "0%";
-  }, duration * 1000 + 150);
+  }, duration * 1000 + 120);
 }
