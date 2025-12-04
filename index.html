@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<div class="lang-global">
+<div class="lang-global" style="display: none;">
   <button id="globalLang">EN</button>
 </div>
 
@@ -22,15 +22,15 @@
   </div>
 
   <div class="input-area">
-    <input id="titleInput" placeholder="제목을 입력하세요 (선택)">
-    <textarea id="textInput" placeholder="본문을 입력하세요"></textarea>
+    <input id="titleInput" placeholder="Title(not essential)">
+    <textarea id="textInput" placeholder="Main text"></textarea>
     <button id="runBtn">Proofread</button>
   </div>
 
   <!-- Toolbar -->
   <div id="toolbar" class="toolbar hidden">
-    <button id="applyAllBtn" class="toolbar-btn apply">✔ 모두 적용</button>
-    <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ 모두 거부</button>
+    <button id="applyAllBtn" class="toolbar-btn apply">✔ Accept All</button>
+    <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ Ignore All</button>
   </div>
 
   <div id="viewer" class="viewer"></div>
