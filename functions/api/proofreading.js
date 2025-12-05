@@ -12,7 +12,7 @@ export async function onRequestPost(context) {
           accept: "*/*",
           "content-type": "application/json",
           "x-auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaXAtZ3ciLCJpYXQiOjE3NjQ3NTc3MTUsImV4cCI6MTc2NDg0NDExNSwic3ViIjoiNDMwMjE3NmYtMDVkMC00ZGUzLTgyMTctNmYwNWQwOWRlMzdiIn0.Q6HIhHxxYYqe5UBU9f5eBOy-b83WXzrtD8n8txFPQaA",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaXAtZ3ciLCJpYXQiOjE3NjQ5Mzg4MzIsImV4cCI6MTc2NTAyNTIzMiwic3ViIjoiMGI2YWQzNzYtNDk1Ny00OWM5LWFhZDMtNzY0OTU3NTljOWRjIn0.f5Fwsc1f2TXzS_XLDtMjMcgPpuGOiLDce8cnK_ru8Dg",
           Referer: "https://frontwt.edu-poly.com/"
         },
         body: JSON.stringify({
