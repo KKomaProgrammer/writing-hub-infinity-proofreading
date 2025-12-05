@@ -74,7 +74,7 @@ async function doProofread() {
     };
 
     const res = await fetch("/api/proofread", {
-        method: "POST",
+        method: "GET",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     });
