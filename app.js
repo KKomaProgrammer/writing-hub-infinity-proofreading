@@ -116,15 +116,15 @@ function freeze(str) {
 }
 
 
-// -------------------------
-// 언어 전환
-// -------------------------
-document.getElementById("langToggle").onclick = () => {
-  lang = lang === "en" ? "ko" : "en";
-  const m = matches[window.currentID];
-  document.getElementById("popup-body").textContent =
-    lang === "en" ? m.data.feedback : m.data.feedback_ko;
-};
+// // -------------------------
+// // 언어 전환
+// // -------------------------
+// document.getElementById("langToggle").onclick = () => {
+//   lang = lang === "en" ? "ko" : "en";
+//   const m = matches[window.currentID];
+//   document.getElementById("popup-body").textContent =
+//     lang === "en" ? m.data.feedback : m.data.feedback_ko;
+// };
 
 
 // -------------------------
@@ -203,3 +203,40 @@ function ignoreAll() {
 function closePopup() {
   document.getElementById("popup").classList.add("hidden");
 }
+let UIlang = "en";
+
+// ===============================
+// 언어 토글
+// ===============================
+const langSwitch = document.getElementById("langSwitch");
+langSwitch.onclick = () => {
+  const newLang = UIlang === "en" ? "ko" : "en";
+  setLanguage(newLang);
+};
+
+// ===============================
+// UI 전체 언어 변경 함수
+// ===============================
+function setLanguage(l) {
+  UIlang = l;
+
+  // 토글 스위치 외관 전환
+  if (UIlang === "en") langSwitch.classList.remove("on");
+  else langSwitch.classList.add("on");
+
+  // HTML의 모든 data-eng / data-kor를 찾아 변환
+  document.querySelectorAll("[data-eng]").forEach(el => {
+    const text = UIlang === "en" ? el.dataset.eng : el.dataset.kor;
+    if (text !== undefined) el.textContent = text;
+  });
+
+  // popup 내용도 즉시 반영
+  if (window.currentID !== undefined) {
+    const m = matches[window.currentID];
+    document.getElementById("popup-body").textContent =
+      UIlang === "en" ? m.data.feedback : m.data.feedback_ko;
+  }
+}
+
+// 초기 언어 설정
+setLanguage("en");
