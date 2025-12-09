@@ -149,11 +149,17 @@ document.getElementById("btn-accept").onclick = () => {
   render();
 };
 
+document.getElementById("applyAllBtn").onclick = () => {
+  applyAll()
+  closePopup();
+  render();
+};
+
 
 // -------------------------
 // 단일 거부
 // -------------------------
-document.getElementById("btn-ignore").onclick = () => {
+document.getElementById("ignoreAllBtn").onclick = () => {
   matches[window.currentID].ignored = true;
   closePopup();
   render();
