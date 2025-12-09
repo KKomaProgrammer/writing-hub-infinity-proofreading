@@ -142,3 +142,10 @@ h1 {
   border-radius: 10px;
   border: none;
 }
+.apply {
+  background: #2db783;   /* 초록색 */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+}
