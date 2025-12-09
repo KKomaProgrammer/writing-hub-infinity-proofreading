@@ -8,19 +8,27 @@
 </head>
 <body>
 <div class="container">
-
-  <h1>AI Proofreading</h1>
+  <h1 data-eng="Writing Hub AI Proofreading" data-kor="Writing Hub AI 첨삭"></h1>
+  <!-- <h1>AI Proofreading</h1> -->
 
   <div class="input-area">
     <input id="titleInput" placeholder="제목을 입력하세요 (선택)">
     <textarea id="textInput" placeholder="본문을 입력하세요"></textarea>
-    <button id="runBtn">Proofread</button>
+    <button id="runBtn" data-eng="Proofread" data-kor="검사"></button>
   </div>
 
   <!-- 아름다운 개선된 Toolbar -->
   <div id="toolbar" class="toolbar hidden">
-    <button id="applyAllBtn" class="toolbar-btn apply">✔ 모두 적용</button>
-    <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ 모두 거부</button>
+    <!-- <button id="applyAllBtn" class="toolbar-btn apply">✔ 모두 적용</button> -->
+    <button id="applyAllBtn"
+        class="toolbar-btn apply"
+        data-eng="✔ Apply All"
+        data-kor="✔ 모두 적용"></button>
+    <!-- <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ 모두 거부</button>-->
+    <button id="ignoreAllBtn"
+        class="toolbar-btn ignore"
+        data-eng="✖ Ignore All"
+        data-kor="✖ 모두 거부"></button>
   </div>
 
   <div id="viewer" class="viewer"></div>
@@ -41,8 +49,8 @@
   <div id="popup-body" class="popup-body"></div>
 
   <div class="popup-footer">
-    <button id="btn-accept" class="accept">Apply</button>
-    <button id="btn-ignore" class="ignore">Ignore</button>
+    <button id="btn-accept" class="accept" data-eng="Apply" data-kor="적용">Apply</button>
+    <button id="btn-ignore" class="ignore" data-eng="Ignore" data-kor="거부">Ignore</button>
   </div>
 </div>
 
