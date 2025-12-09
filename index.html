@@ -1,173 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>AI Proofreading</title>
-  <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f7f7f7;
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 24px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 180px;
-      padding: 12px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      resize: vertical;
-      box-sizing: border-box;
-      margin-bottom: 15px;
-    }
-
-    .btn-row {
-      margin-bottom: 15px;
-    }
-
-    button {
-      padding: 9px 15px;
-      margin-right: 7px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background: #0078ff;
-      color: white;
-      font-size: 14px;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    #text-preview {
-      background: white;
-      padding: 15px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      min-height: 200px;
-      white-space: pre-wrap;
-      line-height: 1.55;
-    }
-
-    .error-part {
-      background: #ffecec;
-      border-bottom: 2px solid #ff7979;
-      cursor: pointer;
-      padding: 1px 3px;
-      border-radius: 3px;
-    }
-
-    .wrong {
-      color: #d90000;
-      text-decoration: line-through;
-      margin-right: 4px;
-    }
-
-    .suggest {
-      color: #009e14;
-      font-weight: bold;
-    }
-
-    /* Popup */
-    #popup {
-      position: fixed;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.35);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    #popup-content {
-      background: white;
-      width: 380px;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 25px rgba(0,0,0,0.2);
-    }
-
-    #popup-content h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    #popup-feedback {
-      background: #f6f6f6;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      height: 90px;
-      overflow-y: auto;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    #loading-container {
-      width: 100%;
-      height: 6px;
-      background: #ddd;
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 10px 0 20px 0;
-      opacity: 1;
-      transition: opacity 0.4s;
-    }
-
-    #loading-bar {
-      height: 100%;
-      width: 0%;
-      background: #32a4ff;
-      transition: width 0.2s linear;
-    }
-  </style>
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/app.js"></script>
 </head>
-
 <body>
+<div class="container">
 
-<h1>AI Proofreading</h1>
+  <h1>AI Proofreading</h1>
 
-<div id="loading-container">
-  <div id="loading-bar"></div>
+  <div class="input-area">
+    <input id="titleInput" placeholder="제목을 입력하세요 (선택)">
+    <textarea id="textInput" placeholder="본문을 입력하세요"></textarea>
+    <button id="runBtn">Proofread</button>
+  </div>
+
+  <!-- 아름다운 개선된 Toolbar -->
+  <div id="toolbar" class="toolbar hidden">
+    <button id="applyAllBtn" class="toolbar-btn apply">✔ 모두 적용</button>
+    <button id="ignoreAllBtn" class="toolbar-btn ignore">✖ 모두 거부</button>
+  </div>
+
+  <div id="viewer" class="viewer"></div>
+
 </div>
-
-<textarea id="textarea" placeholder="Enter your text here"></textarea>
-
-<div class="btn-row">
-  <button id="start">Run Proofreading</button>
-  <button id="apply-all">Apply All</button>
-  <button id="ignore-all">Reject All</button>
-  <button id="lang-switch" style="display: none;">Switch KR/EN</button>
-</div>
-
-<div id="text-preview"></div>
 
 <!-- Popup -->
-<div id="popup">
-  <div id="popup-content">
-    <h3>Suggested Correction</h3>
+<div id="popup" class="popup hidden">
+  <div class="popup-header">
+    <span id="popup-original" class="popup-original"></span>
+    <span class="arrow">></span>
+    <span id="popup-suggest" class="popup-suggest"></span>
 
-    <p><b>Incorrect part:</b> <span id="popup-wrong"></span></p>
-    <p><b>Suggested edit:</b> <span id="popup-correct" style="color:#009e14"></span></p>
+    <!-- 즉시 전환되는 EN/KO -->
+    <button id="langToggle" class="lang-btn">EN</button>
+  </div>
 
-    <div id="popup-feedback"></div>
+  <div id="popup-body" class="popup-body"></div>
 
-    <div style="text-align:right; margin-top:15px;">
-      <button id="btn-accept">Apply</button>
-      <button id="btn-ignore" style="background:#888;">Reject</button>
-    </div>
+  <div class="popup-footer">
+    <button id="btn-accept" class="accept">Apply</button>
+    <button id="btn-ignore" class="ignore">Ignore</button>
   </div>
 </div>
 
-<script src="app.js"></script>
 </body>
 </html>
